@@ -71,7 +71,12 @@ public:
                 return ret;
             }
         }
-        return socket->connect(hostname, port);
+        SocketAddress sockAddr;
+        if ((ret = network->gethostbyname(hostname, &sockAddr)) != NSAPI_ERROR_OK) {
+            return ret;
+        }
+        sockAddr.set_port(port);
+        return socket->connect(sockAddr);
     }
 
     int disconnect()

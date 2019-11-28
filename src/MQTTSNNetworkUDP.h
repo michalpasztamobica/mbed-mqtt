@@ -46,7 +46,9 @@ public:
     int connect(const char *hostname, int port)
     {
         socket->open(network);
-        SocketAddress addr(hostname, port);
+        SocketAddress addr;
+        network->gethostbyname(hostname, &addr);
+        addr.set_port(port);
         return socket->connect(addr);
     }
 

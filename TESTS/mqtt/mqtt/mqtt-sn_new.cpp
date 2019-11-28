@@ -22,9 +22,11 @@
 #define MQTTSN_API_INIT() \
     arrivedcountSN = 0; \
     NetworkInterface *net = NetworkInterface::get_default_instance(); \
-    SocketAddress sockAddr(mqtt_global::hostname, mqtt_global::port_udp); \
     UDPSocket socket; \
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, socket.open(net)); \
+    SocketAddress sockAddr; \
+    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, net->gethostbyname(mqtt_global::hostname, &sockAddr)); \
+    sockAddr.set_port(mqtt_global::port_udp); \
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, socket.connect(sockAddr)); \
     MQTTClient client(&socket); \
     MQTTSNPacket_connectData data = MQTTSNPacket_connectData_initializer;
@@ -43,16 +45,13 @@ void MQTTSN_TEST_CONNECT()
 void MQTTSN_CONNECT_NOT_CONNECTED()
 {
     NetworkInterface *net = NetworkInterface::get_default_instance();
-    SocketAddress sockAddr("i.dont.exist", mqtt_global::port_udp);
     UDPSocket socket;
     TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, socket.open(net));
 
-    //Connect in UDP is not real, it will return success...
-    TEST_ASSERT_EQUAL(NSAPI_ERROR_OK, socket.connect(sockAddr));
     MQTTClient client(&socket);
     MQTTSNPacket_connectData data = MQTTSNPacket_connectData_initializer;
 
-    //... but we should not be able to connect to the server.
+    // UDP is connectionless but we should not be able to connect to the server if we did not connect the socket.
     TEST_ASSERT_EQUAL(NSAPI_ERROR_NO_CONNECTION, client.connect(data));
 }
 

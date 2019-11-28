@@ -230,7 +230,7 @@ Device is connected to network.
 
 **Test steps:**
 
-1. Try to connect to a nonexistent MQTT server address or incorrect port.
+1. Try to connect to a nonexistent MQTT server address or incorrect port or entirely skip the socket connection stage.
 2. Call `client.connect()` with a valid connectData provided.
 
 **Expected result:**
